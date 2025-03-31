@@ -1,0 +1,86 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Notification {
+  id         String               @id @default(uuid())
+  userId     String
+  type       NotificationType
+  title      String
+  message    String
+  read       Boolean              @default(false)
+  isActive   Boolean              @default(true)
+  metadata   Json?
+  createdAt  DateTime             @default(now())
+  updatedAt  DateTime             @updatedAt
+  sentVia    NotificationChannel[]
+}
+
+model NotificationChannel {
+  id             String           @id @default(uuid())
+  notificationId String
+  notification   Notification     @relation(fields: [notificationId], references: [id])
+  channel        Channel
+  status         DeliveryStatus   @default(PENDING)
+  sentAt         DateTime?
+  error          String?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+}
+
+model UserPreference {
+  id             String          @id @default(uuid())
+  userId         String          @unique
+  emailEnabled   Boolean         @default(true)
+  pushEnabled    Boolean         @default(true)
+  smsEnabled     Boolean         @default(false)
+  emailAddress   String?
+  phoneNumber    String?
+  deviceTokens   String[]
+  categories     NotificationType[]
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+}
+
+model NotificationTemplate {
+  id          String             @id @default(uuid())
+  name        String             @unique
+  type        NotificationType
+  subject     String?
+  htmlBody    String?
+  textBody    String
+  isActive    Boolean            @default(true)
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+}
+
+enum NotificationType {
+  SYSTEM
+  NEW_LOCATION
+  LOCATION_MODERATION
+  REVIEW
+  REPORT_STATUS
+  ACCESS_FEATURES
+  EVENT
+  MESSAGE
+}
+
+enum Channel {
+  EMAIL
+  PUSH
+  SMS
+  IN_APP
+}
+
+enum DeliveryStatus {
+  PENDING
+  SENT
+  FAILED
+  DELIVERED
+  READ
+}

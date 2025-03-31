@@ -1,0 +1,32 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model File {
+  id              String    @id @default(uuid())
+  originalName    String
+  filename        String    @unique
+  path            String
+  mimeType        String
+  size            Int
+  locationId      String?
+  userId          String
+  isPublic        Boolean   @default(true)
+  status          FileStatus @default(ACTIVE)
+  thumbnailPath   String?
+  metadata        Json?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
+enum FileStatus {
+  ACTIVE
+  DELETED
+  PENDING
+  REJECTED
+}

@@ -1,0 +1,282 @@
+version: '3.8'
+
+services:
+  # Nginx API Gateway
+  api-gateway:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./api-gateway/nginx.conf:/etc/nginx/nginx.conf
+      - ./api-gateway/conf.d:/etc/nginx/conf.d
+      - ./api-gateway/certs:/etc/nginx/certs
+    depends_on:
+      - auth-service
+      - location-service
+      - user-service
+      - file-service
+      - moderation-service
+      - analytics-service
+      - notification-service
+    networks:
+      - frontend-network
+      - backend-network
+
+  # PostgreSQL з PostGIS
+  postgres:
+    image: postgis/postgis:15-3.3
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: bezbarierny_access
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init:/docker-entrypoint-initdb.d
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d bezbarierny_access"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - backend-network
+
+  # Redis для кешування
+  redis:
+    image: redis:7-alpine
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - backend-network
+
+  # Elasticsearch для пошуку
+  elasticsearch:
+    image: elasticsearch:8.11.1
+    environment:
+      - "discovery.type=single-node"
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - "xpack.security.enabled=false"
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+    networks:
+      - backend-network
+
+  # Сервіс аутентифікації та авторизації
+  auth-service:
+    build:
+      context: ./auth-service
+      dockerfile: Dockerfile
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: postgres://admin:password@postgres:5432/bezbarierny_access
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: your_jwt_secret_key
+      PORT: 3001
+    depends_on:
+      - postgres
+      - redis
+    ports:
+      - "3001:3001"
+    networks:
+      - backend-network
+    volumes:
+      - ./auth-service:/app
+      - /app/node_modules
+
+  # Сервіс управління локаціями
+  location-service:
+    build:
+      context: ./location-service
+      dockerfile: Dockerfile
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: postgres://admin:password@postgres:5432/bezbarierny_access
+      REDIS_URL: redis://redis:6379
+      ELASTICSEARCH_URL: http://elasticsearch:9200
+      PORT: 3002
+    depends_on:
+      - postgres
+      - redis
+      - elasticsearch
+    ports:
+      - "3002:3002"
+    networks:
+      - backend-network
+    volumes:
+      - ./location-service:/app
+      - /app/node_modules
+
+  # Сервіс управління користувачами
+  user-service:
+    build:
+      context: ./user-service
+      dockerfile: Dockerfile
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: postgres://admin:password@postgres:5432/bezbarierny_access
+      REDIS_URL: redis://redis:6379
+      PORT: 3003
+    depends_on:
+      - postgres
+      - redis
+    ports:
+      - "3003:3003"
+    networks:
+      - backend-network
+    volumes:
+      - ./user-service:/app
+      - /app/node_modules
+
+  # Сервіс управління файлами
+  file-service:
+    build:
+      context: ./file-service
+    container_name: file-service
+    restart: unless-stopped
+    volumes:
+      - ./file-service:/app
+      - /app/node_modules
+      - ./file-service/uploads:/app/uploads
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/bezbarierny_files?schema=public
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_EXPIRATION=${JWT_EXPIRATION}
+      - PORT=3000
+      - UPLOAD_DIR=uploads
+      - MAX_FILE_SIZE=10485760 # 10MB
+      - ALLOWED_MIME_TYPES=image/jpeg,image/png,image/gif,application/pdf,image/webp
+      - CORS_ORIGIN=${CORS_ORIGIN}
+    ports:
+      - "3003:3000"
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - bezbarierny-network
+
+  # Сервіс модерації та верифікації
+  moderation-service:
+    build:
+      context: ./moderation-service
+      dockerfile: Dockerfile
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: postgres://admin:password@postgres:5432/bezbarierny_access
+      REDIS_URL: redis://redis:6379
+      FILE_SERVICE_URL: http://file-service:3004
+      PORT: 3005
+    depends_on:
+      - postgres
+      - redis
+      - file-service
+    ports:
+      - "3005:3005"
+    networks:
+      - backend-network
+    volumes:
+      - ./moderation-service:/app
+      - /app/node_modules
+
+  # Сервіс аналітики
+  analytics-service:
+    build: ./analytics-service
+    container_name: analytics-service
+    restart: always
+    ports:
+      - "3008:3000"
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@postgres:5432/${DB_NAME}
+      - REDIS_URL=redis://redis:6379
+    volumes:
+      - ./analytics-service:/app
+      - /app/node_modules
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - backend-network
+
+  # Сервіс сповіщень
+  notification-service:
+    build:
+      context: ./notification-service
+      dockerfile: Dockerfile
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: postgres://admin:password@postgres:5432/bezbarierny_access
+      REDIS_URL: redis://redis:6379
+      PORT: 3007
+    depends_on:
+      - postgres
+      - redis
+    ports:
+      - "3007:3007"
+    networks:
+      - backend-network
+    volumes:
+      - ./notification-service:/app
+      - /app/node_modules
+
+#  # AI-сервіс для модерації зображень
+#  ai-service:
+#    build:
+#      context: ./ai-service
+#      dockerfile: Dockerfile
+#    environment:
+#      PYTHON_ENV: development
+#      DATABASE_URL: postgres://admin:password@postgres:5432/bezbarierny_access
+#      REDIS_URL: redis://redis:6379
+#      PORT: 3008
+#    depends_on:
+#      - postgres
+#      - redis
+#    ports:
+#      - "3008:3008"
+#    networks:
+#      - backend-network
+#    volumes:
+#      - ./ai-service:/app
+#      - /app/.venv
+
+  # Веб-інтерфейс на Next.js
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    environment:
+      NODE_ENV: development
+      NEXT_PUBLIC_API_URL: http://api-gateway
+      PORT: 3000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api-gateway
+    networks:
+      - frontend-network
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.next
+
+networks:
+  frontend-network:
+    driver: bridge
+  backend-network:
+    driver: bridge
+  bezbarierny-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  elasticsearch_data:
+  redis_data:

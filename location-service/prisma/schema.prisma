@@ -1,0 +1,112 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Location {
+  id                   String    @id @default(uuid()) @db.Uuid
+  name                 String
+  address              String
+  coordinates          Unsupported("GEOMETRY(POINT, 4326)") // Використовуємо геопросторовий тип для PostGIS
+  type                 String
+  category             String?
+  description          String?
+  contacts             Json?
+  workingHours         Json?     @map("working_hours")
+  createdBy            String    @map("created_by") @db.Uuid
+  organizationId       String?   @map("organization_id") @db.Uuid
+  status               String    @default("draft")
+  overallAccessibilityScore Int? @map("overall_accessibility_score")
+  createdAt            DateTime  @default(now()) @map("created_at")
+  updatedAt            DateTime  @default(now()) @updatedAt @map("updated_at")
+  lastVerifiedAt       DateTime? @map("last_verified_at")
+  rejectionReason      String?   @map("rejection_reason")
+
+  features             AccessibilityFeature[]
+  photos               Photo[]
+  verifications        Verification[]
+  reviews              Review[]
+
+  @@map("locations")
+}
+
+model AccessibilityFeature {
+  id                 String    @id @default(uuid()) @db.Uuid
+  locationId         String    @map("location_id") @db.Uuid
+  type               String
+  subtype            String?
+  description        String?
+  status             Boolean
+  qualityRating      Int?      @map("quality_rating")
+  standardsCompliance Boolean?  @map("standards_compliance")
+  createdBy          String    @map("created_by") @db.Uuid
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @default(now()) @updatedAt @map("updated_at")
+
+  location           Location  @relation(fields: [locationId], references: [id], onDelete: Cascade)
+  photos             Photo[]
+  verifications      Verification[]
+
+  @@map("accessibility_features")
+}
+
+model Photo {
+  id                    String    @id @default(uuid()) @db.Uuid
+  locationId            String    @map("location_id") @db.Uuid
+  featureId             String?   @map("feature_id") @db.Uuid
+  url                   String
+  thumbnailUrl          String    @map("thumbnail_url")
+  description           String?
+  createdBy             String    @map("created_by") @db.Uuid
+  moderationStatus      String    @default("pending") @map("moderation_status")
+  aiModerationScore     Float?    @map("ai_moderation_score")
+  aiAccessibilityDetection Json?  @map("ai_accessibility_detection")
+  createdAt             DateTime  @default(now()) @map("created_at")
+  rejectReason          String?   @map("reject_reason")
+  metadata              Json?
+
+  location              Location  @relation(fields: [locationId], references: [id], onDelete: Cascade)
+  feature               AccessibilityFeature? @relation(fields: [featureId], references: [id])
+  verifications         Verification[]
+
+  @@map("photos")
+}
+
+model Verification {
+  id                 String    @id @default(uuid()) @db.Uuid
+  locationId         String    @map("location_id") @db.Uuid
+  featureId          String?   @map("feature_id") @db.Uuid
+  verifiedBy         String    @map("verified_by") @db.Uuid
+  organizationId     String?   @map("organization_id") @db.Uuid
+  status             Boolean
+  comment            String?
+  evidencePhotoId    String?   @map("evidence_photo_id") @db.Uuid
+  createdAt          DateTime  @default(now()) @map("created_at")
+  isOfficial         Boolean   @default(false) @map("is_official")
+
+  location           Location  @relation(fields: [locationId], references: [id], onDelete: Cascade)
+  feature            AccessibilityFeature? @relation(fields: [featureId], references: [id])
+  evidencePhoto      Photo?    @relation(fields: [evidencePhotoId], references: [id])
+
+  @@map("verifications")
+}
+
+model Review {
+  id                     String    @id @default(uuid()) @db.Uuid
+  locationId             String    @map("location_id") @db.Uuid
+  userId                 String    @map("user_id") @db.Uuid
+  rating                 Int
+  comment                String?
+  accessibilityExperience String?   @map("accessibility_experience")
+  moderationStatus       String    @default("pending") @map("moderation_status")
+  createdAt              DateTime  @default(now()) @map("created_at")
+  updatedAt              DateTime  @default(now()) @updatedAt @map("updated_at")
+
+  location               Location  @relation(fields: [locationId], references: [id], onDelete: Cascade)
+
+  @@map("reviews")
+}

@@ -1,0 +1,103 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model AnalyticsEvent {
+  id          String    @id @default(uuid())
+  eventType   String    // наприклад: "pageView", "search", "locationView", etc.
+  userId      String?   // може бути null для анонімних користувачів
+  userRole    String?   // роль користувача
+  deviceType  String?   // desktop, mobile, tablet
+  ipAddress   String?   // IP адреса (анонімізована)
+  userAgent   String?   // інформація про браузер
+  referrer    String?   // джерело переходу
+  timestamp   DateTime  @default(now())
+  data        Json?     // додаткові дані події
+  
+  @@index([eventType])
+  @@index([userId])
+  @@index([timestamp])
+}
+
+model AnalyticsReport {
+  id          String    @id @default(uuid())
+  name        String    // назва звіту
+  description String?   // опис звіту
+  type        String    // тип звіту: "daily", "weekly", "monthly", "custom"
+  query       Json      // параметри запиту для генерації звіту
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  lastRunAt   DateTime? // час останнього запуску
+  schedule    String?   // cron-розклад для автоматичної генерації
+  isActive    Boolean   @default(true)
+  creatorId   String    // ID користувача, який створив звіт
+  
+  @@index([type])
+  @@index([creatorId])
+}
+
+model Dashboard {
+  id           String    @id @default(uuid())
+  name         String    // назва дашборду
+  description  String?   // опис дашборду
+  layout       Json      // розташування віджетів
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  isPublic     Boolean   @default(false)
+  creatorId    String    // ID користувача, який створив дашборд
+  
+  @@index([creatorId])
+}
+
+model LocationAnalytics {
+  id                String    @id @default(uuid())
+  locationId        String    // ID локації
+  viewCount         Int       @default(0) // кількість переглядів
+  searchCount       Int       @default(0) // кількість пошуків
+  reviewCount       Int       @default(0) // кількість відгуків
+  avgRating         Float?    // середній рейтинг
+  lastViewed        DateTime? // час останнього перегляду
+  popularityScore   Float     @default(0) // обчислений показник популярності
+  updatedAt         DateTime  @updatedAt
+  
+  @@index([locationId])
+  @@index([popularityScore])
+}
+
+model UserAnalytics {
+  id               String    @id @default(uuid())
+  userId           String    @unique // ID користувача
+  sessionCount     Int       @default(0) // кількість сесій
+  totalTimeSpent   Int       @default(0) // загальний час в секундах
+  lastActivity     DateTime? // час останньої активності
+  locationsAdded   Int       @default(0) // кількість доданих локацій
+  reviewsSubmitted Int       @default(0) // кількість відправлених відгуків
+  searchesPerformed Int      @default(0) // кількість виконаних пошуків
+  updatedAt        DateTime  @updatedAt
+  
+  @@index([userId])
+}
+
+model GeoAnalytics {
+  id               String    @id @default(uuid())
+  regionName       String    // назва регіону
+  cityName         String?   // назва міста
+  locationCount    Int       @default(0) // кількість локацій
+  accessibleCount  Int       @default(0) // кількість доступних локацій
+  inaccessibleCount Int      @default(0) // кількість недоступних локацій
+  partiallyAccessibleCount Int @default(0) // кількість частково доступних локацій
+  popularCategory  String?   // найпопулярніша категорія
+  updatedAt        DateTime  @updatedAt
+  
+  @@unique([regionName, cityName])
+  @@index([regionName])
+  @@index([cityName])
+}

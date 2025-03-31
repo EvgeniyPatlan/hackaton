@@ -1,0 +1,69 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model ModerationItem {
+  id               String             @id @default(uuid())
+  itemType         ItemType
+  itemId           String
+  status           ModerationStatus   @default(PENDING)
+  reason           String?
+  notes            String?
+  submittedBy      String
+  moderatedBy      String?
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  history          ModerationHistory[]
+}
+
+model ModerationHistory {
+  id               String             @id @default(uuid())
+  moderationItemId String
+  moderationItem   ModerationItem     @relation(fields: [moderationItemId], references: [id])
+  status           ModerationStatus
+  reason           String?
+  notes            String?
+  moderatedBy      String?
+  createdAt        DateTime           @default(now())
+}
+
+model Report {
+  id               String             @id @default(uuid())
+  itemType         ItemType
+  itemId           String
+  reason           String
+  description      String?
+  status           ReportStatus       @default(PENDING)
+  reportedBy       String
+  resolvedBy       String?
+  resolution       String?
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+}
+
+enum ItemType {
+  LOCATION
+  REVIEW
+  FILE
+  USER
+  COMMENT
+}
+
+enum ModerationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  FLAGGED
+  REMOVED
+}
+
+enum ReportStatus {
+  PENDING
+  RESOLVED
+  DISMISSED
+}
