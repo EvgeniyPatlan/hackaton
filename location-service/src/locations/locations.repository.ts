@@ -3,7 +3,38 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreateLocationDto } from './dto/create-location.dto';
 import { UpdateLocationDto } from './dto/update-location.dto';
 import { FilterLocationsDto } from './dto/filter-locations.dto';
-import { Prisma, Location } from '@prisma/client';
+import { Prisma } from '@prisma/client';
+
+// Визначаємо власний інтерфейс Location, оскільки з @prisma/client у нас проблеми
+interface Location {
+  id: string;
+  name: string;
+  address: string;
+  coordinates: any; // Для PostGIS Point
+  type: string;
+  category?: string;
+  description?: string;
+  contacts?: any;
+  workingHours?: any;
+  createdBy: string;
+  organizationId?: string;
+  status: string;
+  overallAccessibilityScore?: number;
+  createdAt: Date;
+  updatedAt: Date;
+  lastVerifiedAt?: Date;
+  rejectionReason?: string;
+  [key: string]: any; // Для інших властивостей
+}
+
+// Визначаємо власний інтерфейс для фільтрації
+interface LocationWhereInput {
+  type?: string;
+  category?: string;
+  overallAccessibilityScore?: { gte: number };
+  status?: string;
+  [key: string]: any; // Для інших властивостей
+}
 
 @Injectable()
 export class LocationsRepository {
@@ -25,8 +56,8 @@ export class LocationsRepository {
       radius,
     } = filter;
 
-    // Базовий фільтр
-    const where: Prisma.LocationWhereInput = {
+    // Базовий фільтр з власним інтерфейсом
+    const where: LocationWhereInput = {
       ...(type && { type }),
       ...(category && { category }),
       ...(minAccessibilityScore && {
@@ -50,7 +81,7 @@ export class LocationsRepository {
           ST_SetSRID(ST_GeomFromText(${point}), 4326)::geography, 
           ${radius}
         )
-        AND "type" = ${type || Prisma.DbNull}
+        AND "type" = ${type || null}
         LIMIT ${limit} OFFSET ${(page - 1) * limit}
       `;
       
@@ -62,7 +93,7 @@ export class LocationsRepository {
           ST_SetSRID(ST_GeomFromText(${point}), 4326)::geography, 
           ${radius}
         )
-        AND "type" = ${type || Prisma.DbNull}
+        AND "type" = ${type || null}
       `;
       
       const locations = await locationQuery;
@@ -80,7 +111,7 @@ export class LocationsRepository {
       // Звичайний пошук з пагінацією
       const [locations, count] = await Promise.all([
         this.prisma.location.findMany({
-          where,
+          where: where as any,
           skip: (page - 1) * limit,
           take: limit,
           include: {
@@ -88,7 +119,7 @@ export class LocationsRepository {
           },
           orderBy: { updatedAt: 'desc' },
         }),
-        this.prisma.location.count({ where }),
+        this.prisma.location.count({ where: where as any }),
       ]);
 
       return {

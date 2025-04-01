@@ -3,7 +3,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import * as compression from 'compression';
-import * as helmet from 'helmet';
+import helmet from 'helmet';  // Змінено імпорт
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);

@@ -4,6 +4,7 @@ import { CreateFeatureDto } from './dto/create-feature.dto';
 import { UpdateFeatureDto } from './dto/update-feature.dto';
 import { FilterFeaturesDto } from './dto/filter-features.dto';
 import { RedisService } from '../redis/redis.service';
+import { AccessibilityFeature } from '../types/models';
 
 @Injectable()
 export class FeaturesService {
@@ -75,7 +76,7 @@ export class FeaturesService {
     locationId: string,
     createFeatureDto: CreateFeatureDto,
     userId: string,
-  ) {
+  ): Promise<AccessibilityFeature> {
     // Створюємо елемент безбар'єрності
     const feature = await this.featuresRepository.create(
       locationId,
@@ -98,7 +99,7 @@ export class FeaturesService {
   /**
    * Оновлення елементу безбар'єрності
    */
-  async update(id: string, updateFeatureDto: UpdateFeatureDto) {
+  async update(id: string, updateFeatureDto: UpdateFeatureDto): Promise<AccessibilityFeature> {
     // Отримуємо поточний елемент для визначення ID локації
     const currentFeature = await this.findById(id);
     const locationId = currentFeature.locationId;

@@ -1,7 +1,22 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ElasticsearchService } from '@nestjs/elasticsearch';
-import { Location } from '@prisma/client';
 import { SearchResponse } from '@elastic/elasticsearch/lib/api/types';
+
+// Замінюємо імпорт з @prisma/client на локальний інтерфейс
+interface Location {
+  id: string;
+  name: string;
+  address: string;
+  coordinates: any; // PostGIS геометрична точка
+  type: string;
+  category?: string;
+  description?: string;
+  overallAccessibilityScore?: number;
+  status: string;
+  createdAt: Date;
+  updatedAt: Date;
+  [key: string]: any; // Для інших властивостей
+}
 
 interface LocationSearchBody {
   id: string;

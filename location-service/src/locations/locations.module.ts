@@ -7,7 +7,7 @@ import { LocationsSearchService } from './locations-search.service';
 
 @Module({
   imports: [
-    ElasticsearchModule.forRoot({
+    ElasticsearchModule.register({  // Змінено з forRoot на register
       node: process.env.ELASTICSEARCH_URL || 'http://elasticsearch:9200',
     }),
   ],

@@ -5,6 +5,8 @@ import { RedisService } from '../redis/redis.service';
 import { CreateLocationDto } from './dto/create-location.dto';
 import { UpdateLocationDto } from './dto/update-location.dto';
 import { FilterLocationsDto } from './dto/filter-locations.dto';
+// Імпортуємо тип Location з нашого нового файлу інтерфейсів
+import { Location } from '../types/models';
 
 @Injectable()
 export class LocationsService {
@@ -55,7 +57,7 @@ export class LocationsService {
   /**
    * Отримання локації за ID
    */
-  async findById(id: string, includeFeatures = false) {
+  async findById(id: string, includeFeatures = false): Promise<Location> {
     // Перевіряємо, чи є кеш
     const cacheKey = `location:${id}:${includeFeatures}`;
     const cachedLocation = await this.redisService.get(cacheKey);
@@ -80,7 +82,7 @@ export class LocationsService {
   /**
    * Створення нової локації
    */
-  async create(createLocationDto: CreateLocationDto, userId: string) {
+  async create(createLocationDto: CreateLocationDto, userId: string): Promise<Location> {
     // Створюємо локацію
     const location = await this.locationsRepository.create(
       createLocationDto,
@@ -99,7 +101,7 @@ export class LocationsService {
   /**
    * Оновлення локації
    */
-  async update(id: string, updateLocationDto: UpdateLocationDto, userId: string) {
+  async update(id: string, updateLocationDto: UpdateLocationDto, userId: string): Promise<Location> {
     // Перевіряємо наявність локації
     await this.findById(id);
 
@@ -124,7 +126,7 @@ export class LocationsService {
   /**
    * Видалення локації
    */
-  async delete(id: string) {
+  async delete(id: string): Promise<void> {
     // Перевіряємо наявність локації
     await this.findById(id);
 
@@ -144,7 +146,7 @@ export class LocationsService {
   /**
    * Оновлення статусу локації
    */
-  async updateStatus(id: string, status: string) {
+  async updateStatus(id: string, status: string): Promise<Location> {
     // Перевіряємо наявність локації
     await this.findById(id);
 
@@ -166,7 +168,7 @@ export class LocationsService {
   /**
    * Оновлення оцінки доступності локації
    */
-  async updateAccessibilityScore(id: string, score: number) {
+  async updateAccessibilityScore(id: string, score: number): Promise<Location> {
     // Перевіряємо наявність локації
     await this.findById(id);
 
@@ -191,21 +193,21 @@ export class LocationsService {
   /**
    * Отримання локацій організації
    */
-  async findByOrganization(organizationId: string) {
+  async findByOrganization(organizationId: string): Promise<Location[]> {
     return this.locationsRepository.findByOrganization(organizationId);
   }
 
   /**
    * Отримання локацій, створених користувачем
    */
-  async findByUser(userId: string) {
+  async findByUser(userId: string): Promise<Location[]> {
     return this.locationsRepository.findByUser(userId);
   }
 
   /**
    * Видалення кешу локації
    */
-  private async invalidateLocationCache(id: string) {
+  private async invalidateLocationCache(id: string): Promise<void> {
     // Видаляємо конкретні кеші для локації
     await this.redisService.del(`location:${id}:true`);
     await this.redisService.del(`location:${id}:false`);
@@ -222,7 +224,7 @@ export class LocationsService {
   /**
    * Публікація події про локацію для інших сервісів
    */
-  private async publishLocationEvent(event: string, data: any) {
+  private async publishLocationEvent(event: string, data: any): Promise<void> {
     try {
       const message = JSON.stringify({
         event,

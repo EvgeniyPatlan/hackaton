@@ -23,6 +23,7 @@ import { FeaturesService } from './features.service';
 import { CreateFeatureDto } from './dto/create-feature.dto';
 import { UpdateFeatureDto } from './dto/update-feature.dto';
 import { FilterFeaturesDto } from './dto/filter-features.dto';
+import { AccessibilityFeature } from '../types/models';
 
 // Імпорти для JWT Guard мають бути реалізовані у вашому проекті
 // Тут використовуємо заглушку для JWT Guard
@@ -75,7 +76,7 @@ export class FeaturesController {
     @Param('locationId') locationId: string,
     @Body() createFeatureDto: CreateFeatureDto,
     @Request() req,
-  ) {
+  ):  Promise<AccessibilityFeature> {
     // req.user.id має бути доступним після проходження JwtAuthGuard
     const userId = req.user?.id || 'system';
     return this.featuresService.create(locationId, createFeatureDto, userId);
@@ -95,7 +96,7 @@ export class FeaturesController {
   async update(
     @Param('id') id: string,
     @Body() updateFeatureDto: UpdateFeatureDto,
-  ) {
+  ): Promise<AccessibilityFeature> {
     return this.featuresService.update(id, updateFeatureDto);
   }
 

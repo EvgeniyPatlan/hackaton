@@ -3,7 +3,22 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreateFeatureDto } from './dto/create-feature.dto';
 import { UpdateFeatureDto } from './dto/update-feature.dto';
 import { FilterFeaturesDto } from './dto/filter-features.dto';
-import { AccessibilityFeature } from '@prisma/client';
+
+// Визначаємо інтерфейс AccessibilityFeature замість імпорту з @prisma/client
+interface AccessibilityFeature {
+  id: string;
+  locationId: string;
+  type: string;
+  subtype?: string;
+  description?: string;
+  status: boolean;
+  qualityRating?: number;
+  standardsCompliance?: boolean;
+  createdBy: string;
+  createdAt: Date;
+  updatedAt: Date;
+  [key: string]: any; // Для додаткових властивостей
+}
 
 @Injectable()
 export class FeaturesRepository {

@@ -1,9 +1,43 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { CreateReviewDto } from './dto/create-review.dto';
-import { UpdateReviewDto } from './dto/update-review.dto';
-import { FilterReviewsDto } from './dto/filter-reviews.dto';
-import { Review } from '@prisma/client';
+
+// Створюємо інтерфейси для DTO замість імпорту неіснуючих файлів
+interface CreateReviewDto {
+  rating: number;
+  comment?: string;
+  accessibilityExperience?: string;
+  [key: string]: any;
+}
+
+interface UpdateReviewDto {
+  rating?: number;
+  comment?: string;
+  accessibilityExperience?: string;
+  [key: string]: any;
+}
+
+interface FilterReviewsDto {
+  page?: number;
+  limit?: number;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+  moderationStatus?: string;
+  [key: string]: any;
+}
+
+// Замість імпорту з @prisma/client
+interface Review {
+  id: string;
+  locationId: string;
+  userId: string;
+  rating: number;
+  comment?: string;
+  accessibilityExperience?: string;
+  moderationStatus: string;
+  createdAt: Date;
+  updatedAt: Date;
+  [key: string]: any;
+}
 
 @Injectable()
 export class ReviewsRepository {

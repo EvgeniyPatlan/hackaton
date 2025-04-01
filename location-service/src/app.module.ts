@@ -21,8 +21,10 @@ import { HealthModule } from './health/health.module';
     
     // Захист від спама та брутфорсу
     ThrottlerModule.forRoot({
-      ttl: 60, // 1 хвилина
-      limit: 20, // 20 запитів
+      throttlers: [{
+        ttl: 60, // 1 хвилина
+        limit: 20, // 20 запитів
+      }]
     }),
     
     // Health check
@@ -30,7 +32,7 @@ import { HealthModule } from './health/health.module';
     HttpModule,
     
     // Elasticsearch для пошуку
-    ElasticsearchModule.forRoot({
+    ElasticsearchModule.register({  // Змінено forRoot на register
       node: process.env.ELASTICSEARCH_URL || 'http://elasticsearch:9200',
     }),
     
