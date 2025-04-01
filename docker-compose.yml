@@ -138,6 +138,7 @@ services:
   file-service:
     build:
       context: ./file-service
+      dockerfile: Dockerfile
     container_name: file-service
     restart: unless-stopped
     volumes:
@@ -145,21 +146,21 @@ services:
       - /app/node_modules
       - ./file-service/uploads:/app/uploads
     environment:
-      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/bezbarierny_files?schema=public
-      - JWT_SECRET=${JWT_SECRET}
-      - JWT_EXPIRATION=${JWT_EXPIRATION}
-      - PORT=3000
+      - DATABASE_URL=postgresql://admin:password@postgres:5432/bezbarierny_files?schema=public
+      - JWT_SECRET=your_jwt_secret_key
+      - JWT_EXPIRATION=1h
+      - PORT=3004
       - UPLOAD_DIR=uploads
       - MAX_FILE_SIZE=10485760 # 10MB
       - ALLOWED_MIME_TYPES=image/jpeg,image/png,image/gif,application/pdf,image/webp
-      - CORS_ORIGIN=${CORS_ORIGIN}
+      - CORS_ORIGIN=http://localhost
     ports:
-      - "3003:3000"
+      - "3004:3004"
     depends_on:
       - postgres
       - redis
     networks:
-      - bezbarierny-network
+      - backend-network
 
   # Сервіс модерації та верифікації
   moderation-service:
@@ -191,11 +192,9 @@ services:
     restart: always
     ports:
       - "3008:3000"
-    env_file:
-      - .env
     environment:
-      - NODE_ENV=production
-      - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@postgres:5432/${DB_NAME}
+      - NODE_ENV=development
+      - DATABASE_URL=postgres://admin:password@postgres:5432/bezbarierny_access
       - REDIS_URL=redis://redis:6379
     volumes:
       - ./analytics-service:/app
@@ -227,27 +226,6 @@ services:
       - ./notification-service:/app
       - /app/node_modules
 
-#  # AI-сервіс для модерації зображень
-#  ai-service:
-#    build:
-#      context: ./ai-service
-#      dockerfile: Dockerfile
-#    environment:
-#      PYTHON_ENV: development
-#      DATABASE_URL: postgres://admin:password@postgres:5432/bezbarierny_access
-#      REDIS_URL: redis://redis:6379
-#      PORT: 3008
-#    depends_on:
-#      - postgres
-#      - redis
-#    ports:
-#      - "3008:3008"
-#    networks:
-#      - backend-network
-#    volumes:
-#      - ./ai-service:/app
-#      - /app/.venv
-
   # Веб-інтерфейс на Next.js
   frontend:
     build:
@@ -272,8 +250,6 @@ networks:
   frontend-network:
     driver: bridge
   backend-network:
-    driver: bridge
-  bezbarierny-network:
     driver: bridge
 
 volumes:

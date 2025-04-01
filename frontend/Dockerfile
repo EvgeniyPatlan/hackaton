@@ -1,51 +1,50 @@
 FROM node:18-alpine AS base
-
-# Встановлюємо залежності для гарної роботи
+# Install dependencies for proper functioning
 RUN apk add --no-cache libc6-compat
 
-# Створюємо робочу директорію
+# Create working directory
 WORKDIR /app
 
-# Встановлюємо pnpm
+# Install pnpm globally
 RUN npm install -g pnpm
 
-# Етап залежностей
+# Dependency stage
 FROM base AS deps
-# Копіюємо лише файли залежностей
+# Copy only dependency files
 COPY package.json pnpm-lock.yaml* ./
-# Встановлюємо залежності
-RUN pnpm install --frozen-lockfile
+# Install dependencies
+RUN pnpm install --no-frozen-lockfile
 
-# Етап збірки
+# Build stage
 FROM base AS builder
 WORKDIR /app
+# Copy node_modules from deps stage
 COPY --from=deps /app/node_modules ./node_modules
+# Copy all files
 COPY . .
-
-# Перевіряємо змінні середовища в етапі збірки
+# Pass the NEXT_PUBLIC_API_URL build argument if needed
 ARG NEXT_PUBLIC_API_URL
 ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
-
+# Build the Next.js app
 RUN pnpm build
 
-# Етап продуктового сервера
+# Production stage
 FROM base AS runner
 WORKDIR /app
-
 ENV NODE_ENV production
 
-# Створюємо непривілейованого користувача
+# Create a non-root user for security
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 USER nextjs
 
-# Копіюємо public та .next з етапу збірки
+# Copy built assets and node_modules from builder stage
 COPY --from=builder /app/public ./public
-COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/node_modules ./node_modules
 
 EXPOSE 3000
-
 ENV PORT 3000
-# Команда запуску
-CMD ["node", "server.js"]
+
+# Start the application using the start script (which runs "next start")
+CMD ["pnpm", "start"]

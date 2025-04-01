@@ -57,9 +57,9 @@ export default NextAuth({
       if (account && user) {
         return {
           ...token,
-          accessToken: user.accessToken,
-          refreshToken: user.refreshToken,
-          role: user.role,
+          accessToken: (user as any).accessToken,
+          refreshToken: (user as any).refreshToken,
+          role: (user as any).role,
         };
       }
       
@@ -67,10 +67,10 @@ export default NextAuth({
     },
     async session({ session, token }) {
       session.user = session.user || {};
-      session.user.id = token.sub;
-      session.user.role = token.role;
-      session.accessToken = token.accessToken;
-      session.refreshToken = token.refreshToken;
+      (session.user as any).id = token.sub;
+      (session.user as any).role = token.role;
+      (session as any).accessToken = token.accessToken;
+      (session as any).refreshToken = token.refreshToken;
       
       return session;
     },

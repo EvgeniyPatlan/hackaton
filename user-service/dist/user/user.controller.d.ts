@@ -1,0 +1,124 @@
+import { UserService } from './user.service';
+import { ProfileService } from './profile.service';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { QueryUserDto } from './dto/query-user.dto';
+import { CreateProfileDto } from './dto/create-profile.dto';
+import { UpdateProfileDto } from './dto/update-profile.dto';
+import { Role } from '@prisma/client';
+export declare class UserController {
+    private readonly userService;
+    private readonly profileService;
+    constructor(userService: UserService, profileService: ProfileService);
+    createUser(createUserDto: CreateUserDto): Promise<{
+        id: string;
+        email: string;
+        passwordHash: string;
+        firstName: string | null;
+        lastName: string | null;
+        phoneNumber: string | null;
+        role: import(".prisma/client").$Enums.Role;
+        isActive: boolean;
+        createdAt: Date;
+        updatedAt: Date;
+        profileId: string | null;
+    }>;
+    getUsers(queryDto: QueryUserDto): Promise<{
+        users: import(".prisma/client").User[];
+        total: number;
+        page: number;
+        limit: number;
+    }>;
+    getUser(id: string): Promise<{
+        id: string;
+        email: string;
+        passwordHash: string;
+        firstName: string | null;
+        lastName: string | null;
+        phoneNumber: string | null;
+        role: import(".prisma/client").$Enums.Role;
+        isActive: boolean;
+        createdAt: Date;
+        updatedAt: Date;
+        profileId: string | null;
+    }>;
+    updateUser(id: string, updateUserDto: UpdateUserDto): Promise<{
+        id: string;
+        email: string;
+        passwordHash: string;
+        firstName: string | null;
+        lastName: string | null;
+        phoneNumber: string | null;
+        role: import(".prisma/client").$Enums.Role;
+        isActive: boolean;
+        createdAt: Date;
+        updatedAt: Date;
+        profileId: string | null;
+    }>;
+    deleteUser(id: string): Promise<void>;
+    createProfile(id: string, createProfileDto: CreateProfileDto): Promise<{
+        id: string;
+        createdAt: Date;
+        updatedAt: Date;
+        bio: string | null;
+        avatarUrl: string | null;
+        address: string | null;
+        city: string | null;
+        region: string | null;
+        postalCode: string | null;
+        preferences: import("@prisma/client/runtime/library").JsonValue | null;
+        disabilityInfo: import("@prisma/client/runtime/library").JsonValue | null;
+    }>;
+    getProfile(id: string): Promise<{
+        id: string;
+        createdAt: Date;
+        updatedAt: Date;
+        bio: string | null;
+        avatarUrl: string | null;
+        address: string | null;
+        city: string | null;
+        region: string | null;
+        postalCode: string | null;
+        preferences: import("@prisma/client/runtime/library").JsonValue | null;
+        disabilityInfo: import("@prisma/client/runtime/library").JsonValue | null;
+    }>;
+    updateProfile(id: string, updateProfileDto: UpdateProfileDto): Promise<{
+        id: string;
+        createdAt: Date;
+        updatedAt: Date;
+        bio: string | null;
+        avatarUrl: string | null;
+        address: string | null;
+        city: string | null;
+        region: string | null;
+        postalCode: string | null;
+        preferences: import("@prisma/client/runtime/library").JsonValue | null;
+        disabilityInfo: import("@prisma/client/runtime/library").JsonValue | null;
+    }>;
+    updateRole(id: string, role: Role): Promise<{
+        id: string;
+        email: string;
+        passwordHash: string;
+        firstName: string | null;
+        lastName: string | null;
+        phoneNumber: string | null;
+        role: import(".prisma/client").$Enums.Role;
+        isActive: boolean;
+        createdAt: Date;
+        updatedAt: Date;
+        profileId: string | null;
+    }>;
+    setActive(id: string, isActive: boolean): Promise<{
+        id: string;
+        email: string;
+        passwordHash: string;
+        firstName: string | null;
+        lastName: string | null;
+        phoneNumber: string | null;
+        role: import(".prisma/client").$Enums.Role;
+        isActive: boolean;
+        createdAt: Date;
+        updatedAt: Date;
+        profileId: string | null;
+    }>;
+}

@@ -2,12 +2,9 @@ import { Module } from '@nestjs/common';
 import { AnalyticsController } from './analytics.controller';
 import { EventsController } from './events/events.controller';
 import { ReportsController } from './reports/reports.controller';
-import { DashboardsController } from './dashboards/dashboards.controller';
-import { MetricsController } from './metrics/metrics.controller';
 import { AnalyticsService } from './analytics.service';
 import { EventsService } from './events/events.service';
 import { ReportsService } from './reports/reports.service';
-import { DashboardsService } from './dashboards/dashboards.service';
 import { LocationAnalyticsService } from './location-analytics/location-analytics.service';
 import { UserAnalyticsService } from './user-analytics/user-analytics.service';
 import { GeoAnalyticsService } from './geo-analytics/geo-analytics.service';
@@ -24,8 +21,6 @@ import { GeoAnalyticsController } from './geo-analytics/geo-analytics.controller
     AnalyticsController,
     EventsController,
     ReportsController,
-    DashboardsController,
-    MetricsController,
     LocationAnalyticsController,
     UserAnalyticsController,
     GeoAnalyticsController,
@@ -34,7 +29,6 @@ import { GeoAnalyticsController } from './geo-analytics/geo-analytics.controller
     AnalyticsService,
     EventsService,
     ReportsService,
-    DashboardsService,
     LocationAnalyticsService,
     UserAnalyticsService,
     GeoAnalyticsService,

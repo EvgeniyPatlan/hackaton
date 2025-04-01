@@ -14,8 +14,8 @@ const api = axios.create({
 api.interceptors.request.use(
   async (config) => {
     const session = await getSession();
-    if (session?.accessToken) {
-      config.headers.Authorization = `Bearer ${session.accessToken}`;
+    if ((session as any)?.accessToken) {
+      config.headers.Authorization = `Bearer ${(session as any).accessToken}`;
     }
     return config;
   },
@@ -37,9 +37,9 @@ api.interceptors.response.use(
       try {
         // Спробувати оновити токен
         const session = await getSession();
-        if (session?.refreshToken) {
+        if ((session as any)?.refreshToken) {
           const refreshResponse = await axios.post(`${API_URL}/auth/refresh`, {
-            refreshToken: session.refreshToken,
+            refreshToken: (session as any).refreshToken,
           });
           
           // Оновити сесію
@@ -52,7 +52,6 @@ api.interceptors.response.use(
       } catch (refreshError) {
         // Якщо не вдалося оновити токен, перенаправити на сторінку входу
         if (typeof window !== 'undefined') {
-          // Перенаправлення на сторінку входу
           window.location.href = '/auth/signin';
         }
       }
@@ -88,11 +87,12 @@ export const locationsApi = {
 };
 
 export const filesApi = {
-  upload: (formData: FormData) => api.post('/files/upload', formData, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
-  }),
+  upload: (formData: FormData) =>
+    api.post('/files/upload', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    }),
   getFile: (fileId: string) => `${API_URL}/files/${fileId}`,
 };
 

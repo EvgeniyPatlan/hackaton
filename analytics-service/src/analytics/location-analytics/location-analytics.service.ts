@@ -2,6 +2,12 @@ import { Injectable, Logger } from '@nestjs/common';
 import { AnalyticsRepository } from '../analytics.repository';
 import { RedisService } from '../../redis/redis.service';
 
+// Додаємо інтерфейс для типізації статистики за тиждень
+interface WeeklyStat {
+  locationId: string;
+  weeklyViews: number;
+}
+
 @Injectable()
 export class LocationAnalyticsService {
   private readonly logger = new Logger(LocationAnalyticsService.name);
@@ -74,7 +80,7 @@ export class LocationAnalyticsService {
         WHERE "eventType" = 'locationView'
           AND "timestamp" >= $1
         GROUP BY "locationId"
-      `, [oneWeekAgo]);
+      `, [oneWeekAgo]) as WeeklyStat[];
       
       // Оновлюємо рейтинг популярності для кожної локації
       for (const stat of weeklyStats) {

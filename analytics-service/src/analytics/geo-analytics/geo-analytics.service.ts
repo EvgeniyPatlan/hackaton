@@ -2,6 +2,23 @@ import { Injectable, Logger } from '@nestjs/common';
 import { AnalyticsRepository } from '../analytics.repository';
 import { RedisService } from '../../redis/redis.service';
 
+// Додаємо інтерфейс для типізації результату запиту
+interface RegionStat {
+  regionName: string;
+  cityName: string | null;
+  location_count: number;
+  accessible_count: number;
+  inaccessible_count: number;
+  partially_accessible_count: number;
+  popular_category?: string;
+}
+
+interface RegionActivity {
+  regionName: string;
+  unique_users: number;
+  total_views: number;
+}
+
 @Injectable()
 export class GeoAnalyticsService {
   private readonly logger = new Logger(GeoAnalyticsService.name);
@@ -13,8 +30,7 @@ export class GeoAnalyticsService {
 
   async updateGeoStatistics() {
     try {
-      // Отримуємо статистику по регіонах та містах з бази даних
-      // Для цього потрібно з'єднатися з базою даних локацій
+      // Явно вказуємо тип для результату запиту
       const regionStats = await this.analyticsRepository.executeRawQuery(`
         WITH region_stats AS (
           SELECT 
@@ -55,9 +71,9 @@ export class GeoAnalyticsService {
           category_popularity cp ON rs."regionName" = cp."regionName" 
             AND (rs."cityName" = cp."cityName" OR (rs."cityName" IS NULL AND cp."cityName" IS NULL))
             AND cp.rank = 1
-      `);
+      `) as RegionStat[];
 
-      // Оновлюємо дані в таблиці GeoAnalytics
+      // Виправляємо ітерацію з явною типізацією
       for (const stat of regionStats) {
         await this.analyticsRepository.upsertGeoAnalytics(
           stat.regionName,
@@ -102,7 +118,7 @@ export class GeoAnalyticsService {
           l."regionName"
         ORDER BY 
           total_views DESC
-      `, [oneMonthAgo]);
+      `, [oneMonthAgo]) as RegionActivity[];
 
       // Зберігаємо результати в Redis для швидкого доступу
       await this.redisService.set(

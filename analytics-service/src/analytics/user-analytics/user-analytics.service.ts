@@ -2,6 +2,21 @@ import { Injectable, Logger } from '@nestjs/common';
 import { AnalyticsRepository } from '../analytics.repository';
 import { RedisService } from '../../redis/redis.service';
 
+// Інтерфейси для типізації
+interface UserDailyStats {
+  sessionCount: number;
+  timeSpent: number;
+  lastActivity: string | null;
+  locationsAdded: number;
+  reviewsSubmitted: number;
+  searchesPerformed: number;
+}
+
+interface ActiveUserStat {
+  userId: string;
+  eventCount: number;
+}
+
 @Injectable()
 export class UserAnalyticsService {
   private readonly logger = new Logger(UserAnalyticsService.name);
@@ -38,10 +53,10 @@ export class UserAnalyticsService {
     }
   }
 
-  private async getUserDailyStats() {
+  private async getUserDailyStats(): Promise<Record<string, UserDailyStats>> {
     // Отримуємо ключі для всіх користувачів
     const userKeys = await this.redisService.getClient().keys('user:*');
-    const userStats = {};
+    const userStats: Record<string, UserDailyStats> = {};
     
     for (const key of userKeys) {
       const parts = key.split(':');
@@ -106,7 +121,7 @@ export class UserAnalyticsService {
         WHERE "timestamp" >= $1 AND "userId" IS NOT NULL
         GROUP BY "userId"
         ORDER BY "eventCount" DESC
-      `, [oneMonthAgo]);
+      `, [oneMonthAgo]) as ActiveUserStat[];
       
       // Зберігаємо кешовані результати аналізу в Redis
       await this.redisService.set(
@@ -153,7 +168,7 @@ export class UserAnalyticsService {
         SELECT COUNT(DISTINCT "userId") as count
         FROM "AnalyticsEvent"
         WHERE "timestamp" >= $1 AND "userId" IS NOT NULL
-      `, [startDate]);
+      `, [startDate]) as { count: number }[];
       
       return result[0]?.count || 0;
     } catch (error) {
@@ -166,7 +181,7 @@ export class UserAnalyticsService {
     try {
       const result = await this.analyticsRepository.executeRawQuery(`
         SELECT COUNT(DISTINCT "userId") as total FROM "UserAnalytics"
-      `);
+      `) as { total: number }[];
       return result[0]?.total || 0;
     } catch (error) {
       this.logger.error(`Error getting total users: ${error.message}`, error.stack);
