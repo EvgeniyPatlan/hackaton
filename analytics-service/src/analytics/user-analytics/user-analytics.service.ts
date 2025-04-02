@@ -2,8 +2,8 @@ import { Injectable, Logger } from '@nestjs/common';
 import { AnalyticsRepository } from '../analytics.repository';
 import { RedisService } from '../../redis/redis.service';
 
-// Інтерфейси для типізації
-interface UserDailyStats {
+// Інтерфейс для визначення структури статистики користувача
+interface UserStats {
   sessionCount: number;
   timeSpent: number;
   lastActivity: string | null;
@@ -12,7 +12,8 @@ interface UserDailyStats {
   searchesPerformed: number;
 }
 
-interface ActiveUserStat {
+// Інтерфейс для результатів запиту активних користувачів
+interface ActiveUser {
   userId: string;
   eventCount: number;
 }
@@ -33,13 +34,16 @@ export class UserAnalyticsService {
       
       // Оновлюємо статистику в базі даних
       for (const [userId, stats] of Object.entries(userStats)) {
+        // Явно типізуємо stats як UserStats
+        const typedStats = stats as UserStats;
+        
         await this.analyticsRepository.upsertUserAnalytics(userId, {
-          sessionCount: { increment: stats.sessionCount || 0 },
-          totalTimeSpent: { increment: stats.timeSpent || 0 },
-          lastActivity: stats.lastActivity ? new Date(stats.lastActivity) : undefined,
-          locationsAdded: { increment: stats.locationsAdded || 0 },
-          reviewsSubmitted: { increment: stats.reviewsSubmitted || 0 },
-          searchesPerformed: { increment: stats.searchesPerformed || 0 },
+          sessionCount: { increment: typedStats.sessionCount || 0 },
+          totalTimeSpent: { increment: typedStats.timeSpent || 0 },
+          lastActivity: typedStats.lastActivity ? new Date(typedStats.lastActivity) : undefined,
+          locationsAdded: { increment: typedStats.locationsAdded || 0 },
+          reviewsSubmitted: { increment: typedStats.reviewsSubmitted || 0 },
+          searchesPerformed: { increment: typedStats.searchesPerformed || 0 },
         });
       }
       
@@ -53,10 +57,10 @@ export class UserAnalyticsService {
     }
   }
 
-  private async getUserDailyStats(): Promise<Record<string, UserDailyStats>> {
+  private async getUserDailyStats(): Promise<Record<string, UserStats>> {
     // Отримуємо ключі для всіх користувачів
     const userKeys = await this.redisService.getClient().keys('user:*');
-    const userStats: Record<string, UserDailyStats> = {};
+    const userStats: Record<string, UserStats> = {};
     
     for (const key of userKeys) {
       const parts = key.split(':');
@@ -121,12 +125,15 @@ export class UserAnalyticsService {
         WHERE "timestamp" >= $1 AND "userId" IS NOT NULL
         GROUP BY "userId"
         ORDER BY "eventCount" DESC
-      `, [oneMonthAgo]) as ActiveUserStat[];
+      `, [oneMonthAgo]);
+      
+      // Явно типізуємо результат як масив ActiveUser
+      const typedActiveUsers = activeUsers as ActiveUser[];
       
       // Зберігаємо кешовані результати аналізу в Redis
       await this.redisService.set(
         'analytics:monthly:active_users', 
-        JSON.stringify(activeUsers.slice(0, 100)),
+        JSON.stringify(typedActiveUsers.slice(0, 100)),
         60 * 60 * 24 * 7 // зберігаємо на тиждень
       );
       
@@ -168,7 +175,7 @@ export class UserAnalyticsService {
         SELECT COUNT(DISTINCT "userId") as count
         FROM "AnalyticsEvent"
         WHERE "timestamp" >= $1 AND "userId" IS NOT NULL
-      `, [startDate]) as { count: number }[];
+      `, [startDate]);
       
       return result[0]?.count || 0;
     } catch (error) {
@@ -181,7 +188,7 @@ export class UserAnalyticsService {
     try {
       const result = await this.analyticsRepository.executeRawQuery(`
         SELECT COUNT(DISTINCT "userId") as total FROM "UserAnalytics"
-      `) as { total: number }[];
+      `);
       return result[0]?.total || 0;
     } catch (error) {
       this.logger.error(`Error getting total users: ${error.message}`, error.stack);

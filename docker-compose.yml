@@ -89,6 +89,7 @@ services:
     volumes:
       - ./auth-service:/app
       - /app/node_modules
+      - /app/dist
 
   # Сервіс управління локаціями
   location-service:
@@ -112,6 +113,7 @@ services:
     volumes:
       - ./location-service:/app
       - /app/node_modules
+      - /app/dist
 
   # Сервіс управління користувачами
   user-service:
@@ -133,34 +135,36 @@ services:
     volumes:
       - ./user-service:/app
       - /app/node_modules
+      - /app/dist
 
   # Сервіс управління файлами
   file-service:
     build:
       context: ./file-service
-      dockerfile: Dockerfile
     container_name: file-service
     restart: unless-stopped
     volumes:
       - ./file-service:/app
       - /app/node_modules
+      - /app/dist
       - ./file-service/uploads:/app/uploads
     environment:
-      - DATABASE_URL=postgresql://admin:password@postgres:5432/bezbarierny_files?schema=public
+      - DATABASE_URL=postgresql://admin:password@postgres:5432/bezbarierny_access
       - JWT_SECRET=your_jwt_secret_key
-      - JWT_EXPIRATION=1h
-      - PORT=3004
+      - JWT_EXPIRATION=24h
+      - PORT=3000
       - UPLOAD_DIR=uploads
       - MAX_FILE_SIZE=10485760 # 10MB
       - ALLOWED_MIME_TYPES=image/jpeg,image/png,image/gif,application/pdf,image/webp
-      - CORS_ORIGIN=http://localhost
+      - CORS_ORIGIN=*
     ports:
-      - "3004:3004"
+      - "3004:3000"
     depends_on:
       - postgres
       - redis
     networks:
       - backend-network
+      - bezbarierny-network
 
   # Сервіс модерації та верифікації
   moderation-service:
@@ -171,7 +175,7 @@ services:
       NODE_ENV: development
       DATABASE_URL: postgres://admin:password@postgres:5432/bezbarierny_access
       REDIS_URL: redis://redis:6379
-      FILE_SERVICE_URL: http://file-service:3004
+      FILE_SERVICE_URL: http://file-service:3000
       PORT: 3005
     depends_on:
       - postgres
@@ -184,6 +188,7 @@ services:
     volumes:
       - ./moderation-service:/app
       - /app/node_modules
+      - /app/dist
 
   # Сервіс аналітики
   analytics-service:
@@ -193,12 +198,13 @@ services:
     ports:
       - "3008:3000"
     environment:
-      - NODE_ENV=development
-      - DATABASE_URL=postgres://admin:password@postgres:5432/bezbarierny_access
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://admin:password@postgres:5432/bezbarierny_access
       - REDIS_URL=redis://redis:6379
     volumes:
       - ./analytics-service:/app
       - /app/node_modules
+      - /app/dist
     depends_on:
       - postgres
       - redis
@@ -225,6 +231,28 @@ services:
     volumes:
       - ./notification-service:/app
       - /app/node_modules
+      - /app/dist
+
+#  # AI-сервіс для модерації зображень
+#  ai-service:
+#    build:
+#      context: ./ai-service
+#      dockerfile: Dockerfile
+#    environment:
+#      PYTHON_ENV: development
+#      DATABASE_URL: postgres://admin:password@postgres:5432/bezbarierny_access
+#      REDIS_URL: redis://redis:6379
+#      PORT: 3008
+#    depends_on:
+#      - postgres
+#      - redis
+#    ports:
+#      - "3008:3008"
+#    networks:
+#      - backend-network
+#    volumes:
+#      - ./ai-service:/app
+#      - /app/.venv
 
   # Веб-інтерфейс на Next.js
   frontend:
@@ -245,11 +273,14 @@ services:
       - ./frontend:/app
       - /app/node_modules
       - /app/.next
+      - /app/dist
 
 networks:
   frontend-network:
     driver: bridge
   backend-network:
+    driver: bridge
+  bezbarierny-network:
     driver: bridge
 
 volumes:

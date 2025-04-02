@@ -11,13 +11,6 @@ import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { RolesGuard } from '../guards/roles.guard';
 import { Roles } from '../decorators/roles.decorator';
 
-// Локальний інтерфейс для трендів регіонів
-interface RegionalTrendResult {
-  regionName: string;
-  unique_users: number;
-  total_views: number;
-}
-
 @ApiTags('geo-analytics')
 @Controller('geo-analytics')
 export class GeoAnalyticsController {
@@ -69,7 +62,7 @@ export class GeoAnalyticsController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get regional trends analysis' })
   @ApiResponse({ status: 200, description: 'Return regional trends analysis.' })
-  async getRegionalTrends(): Promise<RegionalTrendResult[]> {
+  async getRegionalTrends() {
     return this.geoAnalyticsService.analyzeRegionalTrends();
   }
 }

@@ -4,12 +4,6 @@ import { CreateReportDto } from './dto/create-report.dto';
 import { UpdateReportDto } from './dto/update-report.dto';
 import { QueryReportsDto } from './dto/query-reports.dto';
 
-// Інтерфейс для результату звіту
-interface ReportResult {
-  length: number;
-  // Інші властивості за необхідності
-}
-
 @Injectable()
 export class ReportsService {
   private readonly logger = new Logger(ReportsService.name);
@@ -133,15 +127,18 @@ export class ReportsService {
           const result = await this.analyticsRepository.executeRawQuery(
             queryParams.query,
             parameters,
-          ) as ReportResult[];
+          );
           
           // Оновлюємо інформацію про час останнього запуску
           await this.analyticsRepository.updateReport(report.id, {
             lastRunAt: new Date(),
           });
           
+          // Типізуємо результат як масив для отримання доступу до властивості length
+          const resultArray = Array.isArray(result) ? result : [];
+          
           // Тут можна зберегти результат виконання звіту, відправити email і т.д.
-          this.logger.log(`Report ${report.name} generated successfully with ${result.length} rows`);
+          this.logger.log(`Report ${report.name} generated successfully with ${resultArray.length} rows`);
         } catch (error) {
           this.logger.error(`Error generating report ${report.id}: ${error.message}`, error.stack);
         }
@@ -167,7 +164,7 @@ export class ReportsService {
       const result = await this.analyticsRepository.executeRawQuery(
         queryParams.query,
         queryParams.parameters || [],
-      ) as ReportResult[];
+      );
       
       // Оновлюємо інформацію про час останнього запуску
       await this.analyticsRepository.updateReport(id, {

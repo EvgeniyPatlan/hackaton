@@ -1,0 +1,101 @@
+-- Додайте цей SQL до файлу database/init/01-init.sql
+
+-- Таблиці для аналітики
+
+-- Таблиця подій аналітики
+CREATE TABLE IF NOT EXISTS "AnalyticsEvent" (
+  "id" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  "eventType" VARCHAR(50) NOT NULL,
+  "userId" UUID,
+  "userRole" VARCHAR(50),
+  "deviceType" VARCHAR(50),
+  "ipAddress" VARCHAR(50),
+  "userAgent" TEXT,
+  "referrer" TEXT,
+  "timestamp" TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  "data" JSONB
+);
+
+CREATE INDEX IF NOT EXISTS "idx_analytics_event_eventType" ON "AnalyticsEvent"("eventType");
+CREATE INDEX IF NOT EXISTS "idx_analytics_event_userId" ON "AnalyticsEvent"("userId");
+CREATE INDEX IF NOT EXISTS "idx_analytics_event_timestamp" ON "AnalyticsEvent"("timestamp");
+
+-- Таблиця звітів аналітики
+CREATE TABLE IF NOT EXISTS "AnalyticsReport" (
+  "id" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  "name" VARCHAR(255) NOT NULL,
+  "description" TEXT,
+  "type" VARCHAR(50) NOT NULL,
+  "query" JSONB NOT NULL,
+  "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  "lastRunAt" TIMESTAMP WITH TIME ZONE,
+  "schedule" VARCHAR(50),
+  "isActive" BOOLEAN DEFAULT TRUE,
+  "creatorId" UUID NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS "idx_analytics_report_type" ON "AnalyticsReport"("type");
+CREATE INDEX IF NOT EXISTS "idx_analytics_report_creatorId" ON "AnalyticsReport"("creatorId");
+
+-- Таблиця дашбордів
+CREATE TABLE IF NOT EXISTS "Dashboard" (
+  "id" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  "name" VARCHAR(255) NOT NULL,
+  "description" TEXT,
+  "layout" JSONB NOT NULL,
+  "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  "isPublic" BOOLEAN DEFAULT FALSE,
+  "creatorId" UUID NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS "idx_dashboard_creatorId" ON "Dashboard"("creatorId");
+
+-- Таблиця аналітики локацій
+CREATE TABLE IF NOT EXISTS "LocationAnalytics" (
+  "id" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  "locationId" UUID NOT NULL UNIQUE,
+  "viewCount" INTEGER DEFAULT 0,
+  "searchCount" INTEGER DEFAULT 0,
+  "reviewCount" INTEGER DEFAULT 0,
+  "avgRating" FLOAT,
+  "lastViewed" TIMESTAMP WITH TIME ZONE,
+  "popularityScore" FLOAT DEFAULT 0,
+  "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS "idx_location_analytics_locationId" ON "LocationAnalytics"("locationId");
+CREATE INDEX IF NOT EXISTS "idx_location_analytics_popularityScore" ON "LocationAnalytics"("popularityScore");
+
+-- Таблиця аналітики користувачів
+CREATE TABLE IF NOT EXISTS "UserAnalytics" (
+  "id" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  "userId" UUID NOT NULL UNIQUE,
+  "sessionCount" INTEGER DEFAULT 0,
+  "totalTimeSpent" INTEGER DEFAULT 0,
+  "lastActivity" TIMESTAMP WITH TIME ZONE,
+  "locationsAdded" INTEGER DEFAULT 0,
+  "reviewsSubmitted" INTEGER DEFAULT 0,
+  "searchesPerformed" INTEGER DEFAULT 0,
+  "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS "idx_user_analytics_userId" ON "UserAnalytics"("userId");
+
+-- Таблиця геопросторової аналітики
+CREATE TABLE IF NOT EXISTS "GeoAnalytics" (
+  "id" UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  "regionName" VARCHAR(255) NOT NULL,
+  "cityName" VARCHAR(255),
+  "locationCount" INTEGER DEFAULT 0,
+  "accessibleCount" INTEGER DEFAULT 0,
+  "inaccessibleCount" INTEGER DEFAULT 0,
+  "partiallyAccessibleCount" INTEGER DEFAULT 0,
+  "popularCategory" VARCHAR(255),
+  "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  UNIQUE("regionName", "cityName")
+);
+
+CREATE INDEX IF NOT EXISTS "idx_geo_analytics_regionName" ON "GeoAnalytics"("regionName");
+CREATE INDEX IF NOT EXISTS "idx_geo_analytics_cityName" ON "GeoAnalytics"("cityName");

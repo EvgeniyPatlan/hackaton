@@ -1,10 +1,10 @@
+// next-i18next.config.js
 module.exports = {
   i18n: {
-    defaultLocale: 'uk',
-    locales: ['uk', 'en'],
-    localeDetection: false,
+    defaultLocale: 'en',
+    locales: ['en', 'uk'], // Add the languages you support
   },
-  fallbackLng: {
-    default: ['uk'],
-  },
-}
+  localePath: typeof window === 'undefined'
+    ? require('path').resolve('./public/locales')
+    : '/locales',
+};

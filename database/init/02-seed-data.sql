@@ -78,95 +78,29 @@ INSERT INTO accessibility_features (id, location_id, type, subtype, description,
 -- 5. Додаємо відгуки
 INSERT INTO reviews (id, location_id, user_id, rating, comment, accessibility_experience, moderation_status, created_at) VALUES
 -- ЦНАП Шевченківського району
-('a1a2a3a4-b1b2-c1c2-d1d2-e1e2f1f2f1f2', 'a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d', 'f1b45b7a-e68f-4e42-9eb5-39a3825ea97c', 4, 'Зручний доступ, персонал дуже допоміг', 'Пандус зручний, але трохи крутий. Ліфт чистий та місткий.', 'approved', NOW() - INTERVAL '2 months'),
-('b2b3b4b5-c2c3-d2d3-e2e3-f2f3f2f3f2f3', 'a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d', 'a8912c5e-7f2b-4d8a-b1d6-8c4eea9d2790', 5, 'Дуже доступний центр, все продумано', 'Зручний пандус, просторий ліфт, доступний туалет. Все чудово адаптовано.', 'approved', NOW() - INTERVAL '1 month'),
+('a1a2a3a4-b1b2-c1c2-d1d2-e1e2f1f2g1g2', 'a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d', 'f1b45b7a-e68f-4e42-9eb5-39a3825ea97c', 4, 'Зручний доступ, персонал дуже допоміг', 'Пандус зручний, але трохи крутий. Ліфт чистий та місткий.', 'approved', NOW() - INTERVAL '2 months'),
+('b2b3b4b5-c2c3-d2d3-e2e3-f2f3g2g3h2h3', 'a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d', 'a8912c5e-7f2b-4d8a-b1d6-8c4eea9d2790', 5, 'Дуже доступний центр, все продумано', 'Зручний пандус, просторий ліфт, доступний туалет. Все чудово адаптовано.', 'approved', NOW() - INTERVAL '1 month'),
 
 -- Міністерство цифрової трансформації
-('c3c4c5c6-d3d4-e3e4-f3f4-f3f4f3f4f3f4', 'b2c3d4e5-f6a7-8b9c-0d1e-2f3a4b5c6d7e', 'f1b45b7a-e68f-4e42-9eb5-39a3825ea97c', 5, 'Зразково доступне приміщення', 'Повністю адаптовано для людей з будь-якими особливостями доступу. Працівники уважні та готові допомогти.', 'approved', NOW() - INTERVAL '2 weeks'),
+('c3c4c5c6-d3d4-e3e4-f3f4-g3g4h3h4i3i4', 'b2c3d4e5-f6a7-8b9c-0d1e-2f3a4b5c6d7e', 'f1b45b7a-e68f-4e42-9eb5-39a3825ea97c', 5, 'Зразково доступне приміщення', 'Повністю адаптовано для людей з будь-якими особливостями доступу. Працівники уважні та готові допомогти.', 'approved', NOW() - INTERVAL '2 weeks'),
 
 -- Епіцентр Київ Полярна
-('d4d5d6d7-e4e5-f4f5-f4f5-f4f5f4f5f4f5', 'c3d4e5f6-a7b8-9c0d-1e2f-3a4b5c6d7e8f', 'a8912c5e-7f2b-4d8a-b1d6-8c4eea9d2790', 4, 'Зручний для відвідування з візком', 'Просторі проходи, є ліфти, персонал готовий допомогти. Єдине - іноді в проходах стоять товари, що ускладнює рух.', 'approved', NOW() - INTERVAL '3 months'),
+('d4d5d6d7-e4e5-f4f5-g4g5-h4h5i4i5j4j5', 'c3d4e5f6-a7b8-9c0d-1e2f-3a4b5c6d7e8f', 'a8912c5e-7f2b-4d8a-b1d6-8c4eea9d2790', 4, 'Зручний для відвідування з візком', 'Просторі проходи, є ліфти, персонал готовий допомогти. Єдине - іноді в проходах стоять товари, що ускладнює рух.', 'approved', NOW() - INTERVAL '3 months'),
 
 -- McDonalds Хрещатик
-('e5e6e7e8-f5f6-f5f6-f5f6-f5f6f5f6f5f6', 'd4e5f6a7-b8c9-0d1e-2f3a-4b5c6d7e8f9a', 'f1b45b7a-e68f-4e42-9eb5-39a3825ea97c', 5, 'Повністю доступний ресторан', 'Зручний вхід з пандусом, просторий зал, доступний туалет. Все на вищому рівні.', 'approved', NOW() - INTERVAL '3 weeks');
+('e5e6e7e8-f5f6-g5g6-h5h6-i5i6j5j6k5k6', 'd4e5f6a7-b8c9-0d1e-2f3a-4b5c6d7e8f9a', 'f1b45b7a-e68f-4e42-9eb5-39a3825ea97c', 5, 'Повністю доступний ресторан', 'Зручний вхід з пандусом, просторий зал, доступний туалет. Все на вищому рівні.', 'approved', NOW() - INTERVAL '3 weeks');
 
 -- 6. Додаємо верифікації
 INSERT INTO verifications (id, location_id, feature_id, verified_by, organization_id, status, comment, created_at, is_official) VALUES
 -- ЦНАП - пандус
-('a1a1a1a1-b1b1-c1c1-d1d1-e1e1f1f1f1f1', 'a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d', '1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d', '3a4b5c6d-7e8f-9a0b-1c2d-3e4f5a6b7c8d', '91e17dcb-b239-469e-acdc-4ade1066391c', true, 'Пандус відповідає нормам ДБН, має поручні з обох сторін', NOW() - INTERVAL '1 month', true),
+('a1a1a1a1-b1b1-c1c1-d1d1-e1e1f1f1g1g1', 'a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d', '1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d', '3a4b5c6d-7e8f-9a0b-1c2d-3e4f5a6b7c8d', '91e17dcb-b239-469e-acdc-4ade1066391c', true, 'Пандус відповідає нормам ДБН, має поручні з обох сторін', NOW() - INTERVAL '1 month', true),
 
 -- Міністерство - ліфт
-('b2b2b2b2-c2c2-d2d2-e2e2-f2f2f2f2f2f2', 'b2c3d4e5-f6a7-8b9c-0d1e-2f3a4b5c6d7e', '5e6f7a8b-9c0d-1e2f-3a4b-5c6d7e8f9a0b', '3a4b5c6d-7e8f-9a0b-1c2d-3e4f5a6b7c8d', '91e17dcb-b239-469e-acdc-4ade1066391c', true, 'Ліфт просторий, має звукові сигнали та тактильні кнопки', NOW() - INTERVAL '2 weeks', true),
+('b2b2b2b2-c2c2-d2d2-e2e2-f2f2g2g2h2h2', 'b2c3d4e5-f6a7-8b9c-0d1e-2f3a4b5c6d7e', '5e6f7a8b-9c0d-1e2f-3a4b-5c6d7e8f9a0b', '3a4b5c6d-7e8f-9a0b-1c2d-3e4f5a6b7c8d', '91e17dcb-b239-469e-acdc-4ade1066391c', true, 'Ліфт просторий, має звукові сигнали та тактильні кнопки', NOW() - INTERVAL '2 weeks', true),
 
 -- Епіцентр - паркування
-('c3c3c3c3-d3d3-e3e3-f3f3-f3f3f3f3f3f3', 'c3d4e5f6-a7b8-9c0d-1e2f-3a4b5c6d7e8f', '1e2f3a4b-5c6d-7e8f-9a0b-1c2d3e4f5a6b', '3a4b5c6d-7e8f-9a0b-1c2d-3e4f5a6b7c8d', '91e17dcb-b239-469e-acdc-4ade1066391c', true, 'Паркувальні місця відповідають стандартам, правильно позначені', NOW() - INTERVAL '3 months', true);
+('c3c3c3c3-d3d3-e3e3-f3f3-g3g3h3h3i3i3', 'c3d4e5f6-a7b8-9c0d-1e2f-3a4b5c6d7e8f', '1e2f3a4b-5c6d-7e8f-9a0b-1c2d3e4f5a6b', '3a4b5c6d-7e8f-9a0b-1c2d-3e4f5a6b7c8d', '91e17dcb-b239-469e-acdc-4ade1066391c', true, 'Паркувальні місця відповідають стандартам, правильно позначені', NOW() - INTERVAL '3 months', true);
 
 -- 7. Додаємо тестові сповіщення
-INSERT INTO notifications (id, user_id, type, title, message, read, is_active, created_at) VALUES
--- Для звичайного користувача
-('a0a0a0a0-b0b0-c0c0-d0d0-e0e0f0f0f0f0', 'f1b45b7a-e68f-4e42-9eb5-39a3825ea97c', 'SYSTEM', 'Ласкаво просимо до системи', 'Вітаємо у системі "Безбар''єрний доступ України". Тут ви можете додавати та знаходити доступні об''єкти.', false, true, NOW()),
-('b1b1b1b1-c1c1-d1d1-e1e1-f1f1f1f1f1f1', 'f1b45b7a-e68f-4e42-9eb5-39a3825ea97c', 'NEW_LOCATION', 'Нова локація поблизу', 'Неподалік від вас додано нову локацію: McDonald''s Хрещатик', false, true, NOW() - INTERVAL '1 day'),
-
--- Для модератора
-('c2c2c2c2-d2d2-e2e2-f2f2-f2f2f2f2f2f2', '3a4b5c6d-7e8f-9a0b-1c2d-3e4f5a6b7c8d', 'LOCATION_MODERATION', 'Нова локація на модерацію', 'Додано нову локацію, яка чекає на вашу перевірку та публікацію.', false, true, NOW() - INTERVAL '3 days'),
-('d3d3d3d3-e3e3-f3f3-f3f3-f3f3f3f3f3f3', '3a4b5c6d-7e8f-9a0b-1c2d-3e4f5a6b7c8d', 'REVIEW', 'Новий відгук на модерацію', 'Додано новий відгук, який потребує перевірки.', true, true, NOW() - INTERVAL '5 days');
-
--- 8. Додаємо канали доставки сповіщень
-INSERT INTO notification_channels (id, notification_id, channel, status, sent_at, created_at) VALUES
-('a1b1c1d1-e1f1-a2b2-c2d2-e2f2a3b3c3d3', 'a0a0a0a0-b0b0-c0c0-d0d0-e0e0f0f0f0f0', 'IN_APP', 'DELIVERED', NOW(), NOW()),
-('b2c2d2e2-f2a3-b3c3-d3e3-f3a4b4c4d4e4', 'a0a0a0a0-b0b0-c0c0-d0d0-e0e0f0f0f0f0', 'EMAIL', 'SENT', NOW(), NOW()),
-('c3d3e3f3-a4b4-c4d4-e4f4-a5b5c5d5e5f5', 'b1b1b1b1-c1c1-d1d1-e1e1-f1f1f1f1f1f1', 'IN_APP', 'DELIVERED', NOW() - INTERVAL '1 day', NOW() - INTERVAL '1 day'),
-('d4e4f4a5-b5c5-d5e5-f5a6-b6c6d6e6f6a7', 'c2c2c2c2-d2d2-e2e2-f2f2-f2f2f2f2f2f2', 'IN_APP', 'DELIVERED', NOW() - INTERVAL '3 days', NOW() - INTERVAL '3 days'),
-('e5f5a6b6-c6d6-e6f6-a7b7-c7d7e7f7a8b8', 'd3d3d3d3-e3e3-f3f3-f3f3-f3f3f3f3f3f3', 'IN_APP', 'READ', NOW() - INTERVAL '5 days', NOW() - INTERVAL '5 days');
-
--- 9. Додаємо налаштування користувачів для сповіщень
-INSERT INTO user_preferences (id, user_id, email_enabled, push_enabled, sms_enabled, email_address, phone_number, created_at) VALUES
-('a1b2c3d4-e5f6-a7b8-c9d0-e1f2a3b4c5d6', 'f1b45b7a-e68f-4e42-9eb5-39a3825ea97c', true, true, false, 'user1@example.com', '+380991234501', NOW()),
-('b2c3d4e5-f6a7-b8c9-d0e1-f2a3b4c5d6e7', 'a8912c5e-7f2b-4d8a-b1d6-8c4eea9d2790', true, true, false, 'user2@example.com', '+380991234502', NOW()),
-('c3d4e5f6-a7b8-c9d0-e1f2-a3b4c5d6e7f8', '3a4b5c6d-7e8f-9a0b-1c2d-3e4f5a6b7c8d', true, true, true, 'moderator@example.com', '+380991234507', NOW());
-
--- 10. Додаємо шаблони сповіщень
-INSERT INTO notification_templates (id, name, type, subject, html_body, text_body, is_active, created_at) VALUES
-('a1b2c3d4-e5f6-a7b8-c9d0-e1f2a3b4c5d6', 'welcome_message', 'SYSTEM', 'Ласкаво просимо до системи "Безбар''єрний доступ України"', '<h1>Вітаємо у системі!</h1><p>Дякуємо, що приєдналися до нас у створенні доступнішого середовища для всіх.</p>', 'Вітаємо у системі! Дякуємо, що приєдналися до нас у створенні доступнішого середовища для всіх.', true, NOW()),
-('b2c3d4e5-f6a7-b8c9-d0e1-f2a3b4c5d6e7', 'new_location_nearby', 'NEW_LOCATION', 'Нова доступна локація поблизу', '<h2>Виявлено нову локацію поблизу!</h2><p>Відвідайте наш сайт, щоб дізнатися більше.</p>', 'Виявлено нову локацію поблизу! Відвідайте наш сайт, щоб дізнатися більше.', true, NOW()),
-('c3d4e5f6-a7b8-c9d0-e1f2-a3b4c5d6e7f8', 'moderation_request', 'LOCATION_MODERATION', 'Потрібна модерація нової локації', '<h2>Нова локація очікує на модерацію</h2><p>Будь ласка, перевірте дані та опублікуйте, якщо все правильно.</p>', 'Нова локація очікує на модерацію. Будь ласка, перевірте дані та опублікуйте, якщо все правильно.', true, NOW());
-
--- 11. Додаємо аналітичні дані для локацій
-INSERT INTO "LocationAnalytics" (id, "locationId", "viewCount", "searchCount", "reviewCount", "avgRating", "lastViewed", "popularityScore", "updatedAt") VALUES
-('a1b2c3d4-e5f6-a7b8-c9d0-e1f2a3b4c5d6', 'a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d', 245, 78, 2, 4.5, NOW() - INTERVAL '2 days', 8.7, NOW()),
-('b2c3d4e5-f6a7-b8c9-d0e1-f2a3b4c5d6e7', 'b2c3d4e5-f6a7-8b9c-0d1e-2f3a4b5c6d7e', 320, 92, 1, 5.0, NOW() - INTERVAL '1 day', 9.2, NOW()),
-('c3d4e5f6-a7b8-c9d0-e1f2-a3b4c5d6e7f8', 'c3d4e5f6-a7b8-9c0d-1e2f-3a4b5c6d7e8f', 187, 45, 1, 4.0, NOW() - INTERVAL '5 days', 7.5, NOW()),
-('d4e5f6a7-b8c9-d0e1-f2a3-b4c5d6e7f8a9', 'd4e5f6a7-b8c9-0d1e-2f3a-4b5c6d7e8f9a', 420, 120, 1, 5.0, NOW(), 9.8, NOW());
-
--- 12. Додаємо аналітичні дані для користувачів
-INSERT INTO "UserAnalytics" (id, "userId", "sessionCount", "totalTimeSpent", "lastActivity", "locationsAdded", "reviewsSubmitted", "searchesPerformed", "updatedAt") VALUES
-('a1b2c3d4-e5f6-a7b8-c9d0-e1f2a3b4c5d6', 'f1b45b7a-e68f-4e42-9eb5-39a3825ea97c', 24, 7200, NOW() - INTERVAL '1 day', 1, 2, 15, NOW()),
-('b2c3d4e5-f6a7-b8c9-d0e1-f2a3b4c5d6e7', 'a8912c5e-7f2b-4d8a-b1d6-8c4eea9d2790', 18, 5400, NOW() - INTERVAL '3 days', 1, 2, 12, NOW()),
-('c3d4e5f6-a7b8-c9d0-e1f2-a3b4c5d6e7f8', '3a4b5c6d-7e8f-9a0b-1c2d-3e4f5a6b7c8d', 32, 9600, NOW(), 1, 0, 28, NOW());
-
--- 13. Додаємо геоаналітику
-INSERT INTO "GeoAnalytics" (id, "regionName", "cityName", "locationCount", "accessibleCount", "inaccessibleCount", "partiallyAccessibleCount", "popularCategory", "updatedAt") VALUES
-('a1b2c3d4-e5f6-a7b8-c9d0-e1f2a3b4c5d6', 'Київська', 'Київ', 8, 6, 0, 2, 'government_building', NOW()),
-('b2c3d4e5-f6a7-b8c9-d0e1-f2a3b4c5d6e7', 'Львівська', 'Львів', 5, 3, 1, 1, 'culture', NOW()),
-('c3d4e5f6-a7b8-c9d0-e1f2-a3b4c5d6e7f8', 'Одеська', 'Одеса', 4, 2, 1, 1, 'recreation', NOW());
-
--- 14. Додаємо аналітичні події
-INSERT INTO "AnalyticsEvent" (id, "eventType", "userId", "userRole", "deviceType", "ipAddress", "timestamp", "data") VALUES
-('a1b2c3d4-e5f6-a7b8-c9d0-e1f2a3b4c5d6', 'PAGE_VIEW', 'f1b45b7a-e68f-4e42-9eb5-39a3825ea97c', 'user', 'mobile', '192.168.1.1', NOW() - INTERVAL '1 day', '{"page": "home", "duration": 120}'),
-('b2c3d4e5-f6a7-b8c9-d0e1-f2a3b4c5d6e7', 'SEARCH', 'f1b45b7a-e68f-4e42-9eb5-39a3825ea97c', 'user', 'mobile', '192.168.1.1', NOW() - INTERVAL '1 day', '{"query": "ресторан", "results": 5}'),
-('c3d4e5f6-a7b8-c9d0-e1f2-a3b4c5d6e7f8', 'LOCATION_VIEW', 'a8912c5e-7f2b-4d8a-b1d6-8c4eea9d2790', 'user', 'desktop', '192.168.1.2', NOW() - INTERVAL '2 days', '{"locationId": "d4e5f6a7-b8c9-0d1e-2f3a-4b5c6d7e8f9a", "duration": 180}'),
-('d4e5f6a7-b8c9-d0e1-f2a3-b4c5d6e7f8a9', 'REVIEW_SUBMIT', 'a8912c5e-7f2b-4d8a-b1d6-8c4eea9d2790', 'user', 'desktop', '192.168.1.2', NOW() - INTERVAL '2 days', '{"locationId": "c3d4e5f6-a7b8-9c0d-1e2f-3a4b5c6d7e8f", "rating": 4}');
-
--- 15. Додаємо файли
-INSERT INTO files (id, original_name, filename, path, mime_type, size, location_id, user_id, status, created_at) VALUES
-('a1b2c3d4-e5f6-a7b8-c9d0-e1f2a3b4c5d6', 'вхід_цнап.jpg', 'a1b2c3d4-e5f6-a7b8-c9d0-e1f2a3b4c5d6.jpg', '/uploads/locations/a1b2c3d4-e5f6-a7b8-c9d0-e1f2a3b4c5d6.jpg', 'image/jpeg', 1245678, 'a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d', 'f1b45b7a-e68f-4e42-9eb5-39a3825ea97c', 'ACTIVE', NOW() - INTERVAL '3 months'),
-('b2c3d4e5-f6a7-b8c9-d0e1-f2a3b4c5d6e7', 'пандус_мінцифра.jpg', 'b2c3d4e5-f6a7-b8c9-d0e1-f2a3b4c5d6e7.jpg', '/uploads/locations/b2c3d4e5-f6a7-b8c9-d0e1-f2a3b4c5d6e7.jpg', 'image/jpeg', 987654, 'b2c3d4e5-f6a7-8b9c-0d1e-2f3a4b5c6d7e', '29cb485e-8d4a-4c5b-a7d8-b9f3c1d9e7f6', 'ACTIVE', NOW() - INTERVAL '2 months'),
-('c3d4e5f6-a7b8-c9d0-e1f2-a3b4c5d6e7f8', 'вхід_епіцентр.jpg', 'c3d4e5f6-a7b8-c9d0-e1f2-a3b4c5d6e7f8.jpg', '/uploads/locations/c3d4e5f6-a7b8-c9d0-e1f2-a3b4c5d6e7f8.jpg', 'image/jpeg', 876543, 'c3d4e5f6-a7b8-9c0d-1e2f-3a4b5c6d7e8f', 'd5e7bf9c-8c8f-4b4a-a2d0-6e23d0e4a94b', 'ACTIVE', NOW() - INTERVAL '5 months'),
-('d4e5f6a7-b8c9-d0e1-f2a3-b4c5d6e7f8a9', 'мак_хрещатик.jpg', 'd4e5f6a7-b8c9-d0e1-f2a3-b4c5d6e7f8a9.jpg', '/uploads/locations/d4e5f6a7-b8c9-d0e1-f2a3-b4c5d6e7f8a9.jpg', 'image/jpeg', 765432, 'd4e5f6a7-b8c9-0d1e-2f3a-4b5c6d7e8f9a', '7a6bb89e-31d5-4c3a-bda3-7c9f3b9315ce', 'ACTIVE', NOW() - INTERVAL '1 month');
-
--- 16. Додаємо аудит-логи
-INSERT INTO audit_logs (id, user_id, action, entity_type, entity_id, details, ip_address, user_agent, created_at) VALUES
-('a1b2c3d4-e5f6-a7b8-c9d0-e1f2a3b4c5d6', 'f1b45b7a-e68f-4e42-9eb5-39a3825ea97c', 'CREATE', 'location', 'e5f6a7b8-c9d0-1e2f-3a4b-5c6d7e8f9a0b', '{"name": "Київська міська клінічна лікарня №1"}', '192.168.1.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36', NOW() - INTERVAL '6 months'),
-('b2c3d4e5-f6a7-b8c9-d0e1-f2a3b4c5d6e7', '3a4b5c6d-7e8f-9a0b-1c2d-3e4f5a6b7c8d', 'UPDATE', 'location', 'a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d', '{"status": "published"}', '192.168.1.2', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1.1 Safari/605.1.15', NOW() - INTERVAL '3 months'),
-('c3d4e5f6-a7b8-c9d0-e1f2-a3b4c5d6e7f8', 'a8912c5e-7f2b-4d8a-b1d6-8c4eea9d2790', 'CREATE', 'review', 'd4d5d6d7-e4e5-f4f5-f4f5-f4f5f4f5f4f5', '{"rating": 4, "comment": "Зручний для відвідування з візком"}', '192.168.1.3', 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1.1 Mobile/15E148 Safari/604.1', NOW() - INTERVAL '3 months'),
-('d4e5f6a7-b8c9-d0e1-f2a3-b4c5d6e7f8a9', '3a4b5c6d-7e8f-9a0b-1c2d-3e4f5a6b7c8d', 'UPDATE', 'review', 'd4d5d6d7-e4e5-f4f5-f4f5-f4f5f4f5f4f5', '{"moderation_status": "approved"}', '192.168.1.2', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1.1 Safari/605.1.15', NOW() - INTERVAL '3 months');
+INSERT INTO notifications (id, user_id, type, title, message, link, is_read, created_at) VALUES
+('a0a0a0

@@ -1,63 +1,29 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: [
-    './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
-    './src/components/**/*.{js,ts,jsx,tsx,mdx}',
-    './src/app/**/*.{js,ts,jsx,tsx,mdx}',
-  ],
+  content: ['./src/**/*.{js,ts,jsx,tsx}'],
   theme: {
     extend: {
       colors: {
         primary: {
-          50: '#eef2ff',
-          100: '#e0e7ff',
-          200: '#c7d2fe',
-          300: '#a5b4fc',
-          400: '#818cf8',
-          500: '#6366f1',
-          600: '#4f46e5',
-          700: '#4338ca',
-          800: '#3730a3',
-          900: '#312e81',
-          950: '#1e1b4b',
-        },
-        secondary: {
-          50: '#f0fdfa',
-          100: '#ccfbf1',
-          200: '#99f6e4',
-          300: '#5eead4',
-          400: '#2dd4bf',
-          500: '#14b8a6',
-          600: '#0d9488',
-          700: '#0f766e',
-          800: '#115e59',
-          900: '#134e4a',
-          950: '#042f2e',
-        },
-        accent: {
-          50: '#fff9ec',
-          100: '#ffefc2',
-          200: '#ffdd83',
-          300: '#ffc443',
-          400: '#ffad1e',
-          500: '#fa8e05',
-          600: '#da6a00',
-          700: '#b54d04',
-          800: '#933d09',
-          900: '#79330d',
-          950: '#451a04',
+          50: '#e6f0ff',
+          100: '#cce0ff',
+          200: '#99c0ff',
+          300: '#66a0ff',
+          400: '#3380ff',
+          500: '#0060ff',
+          600: '#0050cc',
+          700: '#003c99',
+          800: '#002866',
+          900: '#001433',
         },
       },
-      fontFamily: {
-        sans: ['var(--font-inter)'],
-        heading: ['var(--font-montserrat)'],
-      },
-      borderRadius: {
-        '4xl': '2rem',
+      spacing: {
+        '72': '18rem',
+        '84': '21rem',
+        '96': '24rem',
+        '128': '32rem',
       },
     },
   },
-  plugins: [
-    require('@tailwindcss/forms'),
-  ],
-}
+  plugins: [],
+};

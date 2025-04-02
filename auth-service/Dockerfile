@@ -2,14 +2,15 @@ FROM node:18-alpine
 
 WORKDIR /app
 
-COPY package*.json ./
+# Встановлення необхідних залежностей для Prisma (альтернативні пакети)
+RUN apk add --no-cache openssl libc6-compat
 
+COPY package*.json ./
 # Встановлення всіх залежностей з використанням legacy-peer-deps для уникнення конфліктів
 RUN npm install --legacy-peer-deps
 
 # Копіювання коду проекту
 COPY . .
-
 RUN rm -rf node_modules/.cache
 RUN rm -rf dist
 

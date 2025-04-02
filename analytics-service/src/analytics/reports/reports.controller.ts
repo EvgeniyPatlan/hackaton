@@ -20,19 +20,6 @@ import { RolesGuard } from '../guards/roles.guard';
 import { Roles } from '../decorators/roles.decorator';
 import { GetUser } from '../decorators/get-user.decorator';
 
-// Локальний інтерфейс для результату звіту
-interface ReportRunResult {
-  reportName: string;
-  generatedAt: Date;
-  result: any[];
-}
-
-// Локальний інтерфейс для результату генерації звітів
-interface ReportGenerationResult {
-  success: boolean;
-  reportsCount: number;
-}
-
 @ApiTags('reports')
 @Controller('reports')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -87,7 +74,7 @@ export class ReportsController {
   @Roles('admin', 'analyst')
   @ApiOperation({ summary: 'Run a report manually' })
   @ApiResponse({ status: 200, description: 'Report run successfully.' })
-  async runReport(@Param('id', ParseUUIDPipe) id: string): Promise<ReportRunResult> {
+  async runReport(@Param('id', ParseUUIDPipe) id: string) {
     return this.reportsService.runReport(id);
   }
 
@@ -95,7 +82,7 @@ export class ReportsController {
   @Roles('admin')
   @ApiOperation({ summary: 'Generate reports by type (daily, weekly, monthly)' })
   @ApiResponse({ status: 200, description: 'Reports generated successfully.' })
-  async generateReports(@Param('type') type: string): Promise<ReportGenerationResult> {
+  async generateReports(@Param('type') type: string) {
     return this.reportsService.generateScheduledReports(type);
   }
 }

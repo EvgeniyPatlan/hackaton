@@ -1,50 +1,35 @@
-FROM node:18-alpine AS base
-# Install dependencies for proper functioning
-RUN apk add --no-cache libc6-compat
+FROM node:18-alpine
 
-# Create working directory
 WORKDIR /app
 
-# Install pnpm globally
-RUN npm install -g pnpm
+# Копіюємо лише package.json спочатку
+COPY package*.json ./
 
-# Dependency stage
-FROM base AS deps
-# Copy only dependency files
-COPY package.json pnpm-lock.yaml* ./
-# Install dependencies
-RUN pnpm install --no-frozen-lockfile
+# Встановлення залежностей, включаючи next-i18next
+RUN npm install next-i18next
 
-# Build stage
-FROM base AS builder
-WORKDIR /app
-# Copy node_modules from deps stage
-COPY --from=deps /app/node_modules ./node_modules
-# Copy all files
+# Копіюємо весь проект
 COPY . .
-# Pass the NEXT_PUBLIC_API_URL build argument if needed
-ARG NEXT_PUBLIC_API_URL
-ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
-# Build the Next.js app
-RUN pnpm build
 
-# Production stage
-FROM base AS runner
-WORKDIR /app
-ENV NODE_ENV production
+# Важливо: переконуємося, що dist-директорія очищена
+RUN rm -rf dist
 
-# Create a non-root user for security
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
-USER nextjs
+# Додаємо діагностичну інформацію
+RUN echo "Вміст поточної директорії:" && ls -la
+RUN echo "Вміст package.json:" && cat package.json
 
-# Copy built assets and node_modules from builder stage
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/node_modules ./node_modules
+# Явно запускаємо збірку і переконуємося, що вона працює
+RUN npm run build
 
+# Перевіряємо результат збірки
+RUN echo "Вміст dist-директорії:" && ls -la dist || echo "Директорія dist не існує!"
+
+# Встановлення locales
+RUN mkdir -p /app/public/locales/en /app/public/locales/uk
+COPY public/locales /app/public/locales
+
+# Експозиція порту (якщо потрібно)
 EXPOSE 3000
-ENV PORT 3000
 
-# Start the application using the start script (which runs "next start")
-CMD ["pnpm", "start"]
+# Запускаємо додаток
+CMD ["npm", "run", "start"]

@@ -5,12 +5,12 @@ import { UpdateLocationDto } from './dto/update-location.dto';
 import { FilterLocationsDto } from './dto/filter-locations.dto';
 import { Prisma } from '@prisma/client';
 
-// Визначаємо власний інтерфейс Location, оскільки з @prisma/client у нас проблеми
+// Custom interface for Location
 interface Location {
   id: string;
   name: string;
   address: string;
-  coordinates: any; // Для PostGIS Point
+  coordinates: any; // For PostGIS Point
   type: string;
   category?: string;
   description?: string;
@@ -24,16 +24,16 @@ interface Location {
   updatedAt: Date;
   lastVerifiedAt?: Date;
   rejectionReason?: string;
-  [key: string]: any; // Для інших властивостей
+  [key: string]: any; // For additional properties
 }
 
-// Визначаємо власний інтерфейс для фільтрації
+// Custom interface for filtering
 interface LocationWhereInput {
   type?: string;
   category?: string;
   overallAccessibilityScore?: { gte: number };
   status?: string;
-  [key: string]: any; // Для інших властивостей
+  [key: string]: any; // For additional properties
 }
 
 @Injectable()
@@ -56,7 +56,7 @@ export class LocationsRepository {
       radius,
     } = filter;
 
-    // Базовий фільтр з власним інтерфейсом
+    // Build filter criteria using our custom interface
     const where: LocationWhereInput = {
       ...(type && { type }),
       ...(category && { category }),
@@ -66,15 +66,11 @@ export class LocationsRepository {
       ...(status && { status }),
     };
 
-    // Якщо вказано координати та радіус, шукаємо об'єкти в радіусі
-    let locationQuery: any = this.prisma.location;
     if (latitude && longitude && radius) {
-      // Використовуємо PostGIS для пошуку в радіусі
-      // ST_DWithin повертає true, якщо відстань між точками менше або дорівнює вказаному радіусу
       const point = `POINT(${longitude} ${latitude})`;
       
-      // Формуємо SQL запит для пошуку по радіусу (радіус у метрах)
-      locationQuery = this.prisma.$queryRaw`
+      // Use a raw SQL query for geospatial search with PostGIS
+      const locationQuery = this.prisma.$queryRaw`
         SELECT * FROM "locations" 
         WHERE ST_DWithin(
           coordinates, 
@@ -85,7 +81,6 @@ export class LocationsRepository {
         LIMIT ${limit} OFFSET ${(page - 1) * limit}
       `;
       
-      // Рахуємо загальну кількість знайдених об'єктів
       const totalCount = await this.prisma.$queryRaw`
         SELECT COUNT(*) FROM "locations" 
         WHERE ST_DWithin(
@@ -96,7 +91,7 @@ export class LocationsRepository {
         AND "type" = ${type || null}
       `;
       
-      const locations = await locationQuery;
+      const locations = (await locationQuery) as unknown as Location[];
       
       return {
         data: locations,
@@ -108,7 +103,7 @@ export class LocationsRepository {
         },
       };
     } else {
-      // Звичайний пошук з пагінацією
+      // Regular paginated search using Prisma API
       const [locations, count] = await Promise.all([
         this.prisma.location.findMany({
           where: where as any,
@@ -123,7 +118,7 @@ export class LocationsRepository {
       ]);
 
       return {
-        data: locations,
+        data: locations as unknown as Location[],
         meta: {
           currentPage: page,
           itemsPerPage: limit,
@@ -146,7 +141,7 @@ export class LocationsRepository {
       throw new NotFoundException(`Location with ID "${id}" not found`);
     }
 
-    return location;
+    return location as unknown as Location;
   }
 
   async create(
@@ -156,10 +151,10 @@ export class LocationsRepository {
     const { latitude, longitude, ...rest } = createLocationDto;
 
     try {
-      // Створюємо геометричну точку з координат
+      // Create a PostGIS point from latitude/longitude
       const point = `POINT(${longitude} ${latitude})`;
       
-      // Виконуємо SQL запит для створення об'єкта з геопросторовими даними
+      // Execute raw SQL for inserting geospatial data
       const location = await this.prisma.$queryRaw`
         INSERT INTO "locations" (
           id, 
@@ -197,8 +192,8 @@ export class LocationsRepository {
         )
         RETURNING *;
       `;
-
-      return location[0];
+      
+      return (location[0] as unknown) as Location;
     } catch (error) {
       this.logger.error(`Error creating location: ${error.message}`);
       throw error;
@@ -211,7 +206,7 @@ export class LocationsRepository {
   ): Promise<Location> {
     const { latitude, longitude, ...rest } = updateLocationDto;
 
-    // Перевіряємо, чи існує локація
+    // Check if the location exists
     const existingLocation = await this.prisma.location.findUnique({
       where: { id },
     });
@@ -222,9 +217,8 @@ export class LocationsRepository {
 
     try {
       let location;
-
-      // Якщо передані координати, оновлюємо геодані
       if (latitude && longitude) {
+        // If coordinates are provided, update via raw SQL
         const point = `POINT(${longitude} ${latitude})`;
         
         location = await this.prisma.$queryRaw`
@@ -245,18 +239,33 @@ export class LocationsRepository {
           WHERE id = ${id}
           RETURNING *;
         `;
+        return (location[0] as unknown) as Location;
       } else {
-        // Якщо координати не передані, використовуємо Prisma API
+        // Build update data with proper type conversion for JSON fields
+        const updateData: Prisma.LocationUpdateInput = {
+          name: rest.name,
+          address: rest.address,
+          type: rest.type,
+          category: rest.category,
+          description: rest.description,
+          contacts: rest.contacts !== undefined
+            ? (rest.contacts as unknown as Prisma.JsonValue)
+            : undefined,
+          workingHours: rest.workingHours !== undefined
+            ? (rest.workingHours as unknown as Prisma.JsonValue)
+            : undefined,
+          organizationId: rest.organizationId,
+          status: rest.status,
+          overallAccessibilityScore: rest.overallAccessibilityScore,
+          updatedAt: new Date(),
+        };
+
         location = await this.prisma.location.update({
           where: { id },
-          data: {
-            ...rest,
-            updatedAt: new Date(),
-          },
+          data: updateData,
         });
+        return location as unknown as Location;
       }
-
-      return location[0] || location;
     } catch (error) {
       this.logger.error(`Error updating location: ${error.message}`);
       throw error;
@@ -264,7 +273,6 @@ export class LocationsRepository {
   }
 
   async delete(id: string): Promise<void> {
-    // Перевіряємо, чи існує локація
     const existingLocation = await this.prisma.location.findUnique({
       where: { id },
     });
@@ -273,43 +281,46 @@ export class LocationsRepository {
       throw new NotFoundException(`Location with ID "${id}" not found`);
     }
 
-    // Видаляємо локацію (каскадне видалення буде працювати завдяки обмеженням зв'язків у БД)
     await this.prisma.location.delete({
       where: { id },
     });
   }
 
   async updateAccessibilityScore(id: string, score: number): Promise<Location> {
-    return this.prisma.location.update({
+    const location = await this.prisma.location.update({
       where: { id },
       data: {
         overallAccessibilityScore: score,
         updatedAt: new Date(),
       },
     });
+    return location as unknown as Location;
   }
 
   async updateStatus(id: string, status: string): Promise<Location> {
-    return this.prisma.location.update({
+    const location = await this.prisma.location.update({
       where: { id },
       data: {
         status,
         updatedAt: new Date(),
       },
     });
+    return location as unknown as Location;
   }
 
   async findByOrganization(organizationId: string) {
-    return this.prisma.location.findMany({
+    const locations = await this.prisma.location.findMany({
       where: { organizationId },
       orderBy: { updatedAt: 'desc' },
     });
+    return locations as unknown as Location[];
   }
 
   async findByUser(userId: string) {
-    return this.prisma.location.findMany({
+    const locations = await this.prisma.location.findMany({
       where: { createdBy: userId },
       orderBy: { updatedAt: 'desc' },
     });
+    return locations as unknown as Location[];
   }
 }
